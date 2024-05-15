@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "413624896339",
+    "project_id": "studentdex-cc60c",
+    "storage_bucket": "studentdex-cc60c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:413624896339:android:3a88a3aa4b7de43168afa6",
+        "android_client_info": {
+          "package_name": "com.example.studentdex"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOzFdR3d8JtVV4ZHTLGmbBWhhlL83Fcz8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

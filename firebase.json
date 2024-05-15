@@ -1,0 +1,22 @@
+{
+    "flutter": {
+        "platforms": {
+            "android": {
+                "default": {
+                    "projectId": "studentdex-cc60c",
+                    "appId": "1:413624896339:android:3a88a3aa4b7de43168afa6",
+                    "fileOutput": "android/app/google-services.json"
+                }
+            },
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "studentdex-cc60c",
+                    "configurations": {
+                        "android": "1:413624896339:android:3a88a3aa4b7de43168afa6",
+                        "web": "1:413624896339:web:f03426ae6941517068afa6"
+                    }
+                }
+            }
+        }
+    }
+}
