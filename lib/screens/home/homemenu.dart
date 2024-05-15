@@ -16,14 +16,14 @@ class HomeMenu extends StatefulWidget {
 class _HomeMenuState extends State<HomeMenu> {
   @override
   Widget build(BuildContext context) {
-    final Future<List<String>> names;
+    final Future<List<dynamic>> names;
 
     names = DatabaseService().getCharacter();
     return FutureBuilder(
         future: names,
         builder: (context, snapshotNames) {
           if (snapshotNames.hasData) {
-            final List<String> names = snapshotNames.requireData;
+            final List<dynamic> names = snapshotNames.requireData;
             return Scaffold(
               appBar: const TopBar(),
               body: GridView.builder(
@@ -33,7 +33,7 @@ class _HomeMenuState extends State<HomeMenu> {
                   ),
                   itemCount: names.length,
                   itemBuilder: (context, index) {
-                    final picturePath = StorageService().getIMG(names[index]);
+                    final picturePath = StorageService().getIMG(names[index]['id']);
                     return FutureBuilder(
                         future: picturePath,
                         builder: (context, snapshotPath) {
@@ -41,10 +41,10 @@ class _HomeMenuState extends State<HomeMenu> {
                             return GestureDetector(
                               onTap: () {
                                 Navigator.pushNamed(context, "/character",
-                                    arguments: names[index]);
+                                    arguments: names[index]['id']);
                               },
                               child: CharacterCard(
-                                name: names[index],
+                                name: names[index]['name'],
                                 picRoute: snapshotPath.requireData,
                               ),
                             );

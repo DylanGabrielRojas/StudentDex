@@ -17,8 +17,8 @@ class _CharacterDetailsState extends State<CharacterDetails> {
     final character = ModalRoute.of(context)!.settings.arguments as String;
     final imgPath = StorageService().getIMG(character);
     final characterData = DatabaseService().getCharacterData(character);
-    final characterRelations =
-        DatabaseService().getCharacterRelations(character);
+    final characterHighSchool =
+        DatabaseService().getCharacterHighSchool(character);
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -35,12 +35,6 @@ class _CharacterDetailsState extends State<CharacterDetails> {
       body: ListView(
         shrinkWrap: true,
         children: [
-          Center(
-            child: BorderedTitle(
-              title: character,
-              titleSize: 100,
-            ),
-          ),
           FutureBuilder(
             future: imgPath,
             builder: (context, snapshot) {
@@ -107,12 +101,12 @@ class _CharacterDetailsState extends State<CharacterDetails> {
           ),
           const Center(
             child: BorderedTitle(
-              title: "Relations",
+              title: "Colegio",
               titleSize: 100,
             ),
           ),
           FutureBuilder(
-            future: characterRelations,
+            future: characterHighSchool,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 final List<String> relation = [
