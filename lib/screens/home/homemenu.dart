@@ -33,7 +33,7 @@ class _HomeMenuState extends State<HomeMenu> {
                   ),
                   itemCount: names.length,
                   itemBuilder: (context, index) {
-                    final picturePath = StorageService().getIMG(names[index]['id']);
+                    final picturePath = StorageService().getIMGfromID(names[index]['id']);
                     return FutureBuilder(
                         future: picturePath,
                         builder: (context, snapshotPath) {

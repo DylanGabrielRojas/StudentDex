@@ -15,10 +15,8 @@ class _CharacterDetailsState extends State<CharacterDetails> {
   @override
   Widget build(BuildContext context) {
     final character = ModalRoute.of(context)!.settings.arguments as String;
-    final imgPath = StorageService().getIMG(character);
+    final imgPath = StorageService().getIMGfromID(character);
     final characterData = DatabaseService().getCharacterData(character);
-    final characterHighSchool =
-        DatabaseService().getCharacterHighSchool(character);
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -64,7 +62,8 @@ class _CharacterDetailsState extends State<CharacterDetails> {
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 15),
                   itemCount: snapshot.data?.length,
                   itemBuilder: (context, index) {
-                    if (keys[index] != 'picture') {
+                    if (keys[index] != 'picture' &&
+                        keys[index] != 'highschool') {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -89,84 +88,52 @@ class _CharacterDetailsState extends State<CharacterDetails> {
                           ),
                         ],
                       );
-                    } else {
-                      return Container();
-                    }
-                  },
-                );
-              } else {
-                return Container();
-              }
-            },
-          ),
-          const Center(
-            child: BorderedTitle(
-              title: "Colegio",
-              titleSize: 100,
-            ),
-          ),
-          FutureBuilder(
-            future: characterHighSchool,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                final List<String> relation = [
-                  for (var e in snapshot.data!.entries) e.key
-                ];
-                final List<dynamic> names = [
-                  for (var e in snapshot.data!.entries) e.value
-                ];
-                return GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 5,
-                    mainAxisExtent: 285,
-                  ),
-                  shrinkWrap: true,
-                  itemCount: snapshot.data?.length,
-                  
-                  itemBuilder: (context, index) {
-                    final picturePath = StorageService().getIMG(names[index]);
-                    return FutureBuilder(
-                        future: picturePath,
+                    } else if (keys[index] == 'highschool') {
+                      final highschool = DatabaseService().getCharacterHighSchool(values[index]);
+                      return FutureBuilder(
+                        future: highschool,
                         builder: (context, snapshot) {
-                          return FutureBuilder(
-                              future: picturePath,
-                              builder: (context, snapshotPath) {
-                                if (snapshotPath.hasData) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.pushNamed(context, "/character",
-                                          arguments: names[index]);
-                                    },
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Center(
-                                          child: BorderedTitle(
-                                            title: relation[index],
-                                            titleSize: 50,
-                                          ),
-                                        ),
-                                        CharacterCard(
-                                          name: names[index],
-                                          picRoute: snapshotPath.requireData,
-                                        ),
-                                      ],
+                          if (snapshot.hasData) {
+                            final picturePath = StorageService().getIMGHighSchool(snapshot.data!['picture']);
+                            return FutureBuilder(
+                              future: picturePath, 
+                              builder: 
+                              (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Center(
+                                      child: BorderedTitle(
+                                        title: "Colegio",
+                                        titleSize: 50,
+                                      ),
                                     ),
+                                    CharacterCard(
+                                      name: values[index],
+                                      picRoute: snapshot.requireData,
+                                    ),
+                                  ],
                                   );
                                 } else {
                                   return Container();
                                 }
-                              });
-                        });
-                  },
+                              }
+                            );
+                          } else {
+                            return Container();
+                          }
+                        }
+                      );
+                    } else {
+                      return Container();
+                    }
+                  }
                 );
               } else {
                 return Container();
               }
-            },
+            }
           ),
         ],
       ),
