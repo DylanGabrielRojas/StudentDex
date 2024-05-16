@@ -1,8 +1,12 @@
+import 'dart:io';
 
-import 'package:flutter/gestures.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:studentdex/services/storage.dart';
+import 'package:studentdex/services/utils.dart';
+import 'package:studentdex/services/database.dart';
 import 'package:flutter/material.dart';
 import '../../components/textfield.dart';
-import '../../components/button.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -12,8 +16,43 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final aliasController = TextEditingController();
+  final annioController = TextEditingController();
+  final hobbiesController = TextEditingController();
+  final musicController = TextEditingController();
+  final sportController = TextEditingController();
+  final seriesController = TextEditingController();
+  String highschool = '';
+  final highschools = DatabaseService().getHighSchools();
+
+  dynamic picture;
+  void selectImage() async {
+    XFile? img = await ImagePicker().pickImage(source: ImageSource.gallery);
+    setState(() {
+      picture = File(img!.path);
+    });
+  }
+
+  Future<dynamic> pushData() async {
+    try {
+      if (picture != null) {
+        final character = {
+          'name': aliasController.text,
+          'annio': annioController.text,
+          'hobbies': hobbiesController.text,
+          'music': musicController.text,
+          'sport': sportController.text,
+          'series': seriesController.text,
+          'highschool': highschool,
+        };
+
+        String id = await DatabaseService().uploadCharacter(character);
+        StorageService().uploadIMG(picture!, id);
+      }
+    } catch (e) {
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,36 +63,95 @@ class _LoginState extends State<Login> {
             Icons.close,
             color: Colors.black,
           ),
-          onPressed: () {Navigator.pushNamed(context, '/');},
+          onPressed: () {
+            Navigator.pushNamed(context, '/');
+          },
         ),
       ),
       body: Form(
         key: _formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: ListView(
           children: [
             TextFieldComponent(
-                text: "email", hide: false, controllerParam: emailController),
+                text: "Alias", hide: false, controllerParam: aliasController),
             TextFieldComponent(
-              text: "password",
-              hide: true,
-              controllerParam: passwordController,
+              text: "Año de nacimiento",
+              hide: false,
+              controllerParam: annioController,
             ),
-            const ButtonComponent(
-                text: "Sign in",
-                textColor: Colors.white,
-                backgroundColor: Colors.red),
-            Text.rich(
-              TextSpan(
+            TextFieldComponent(
+                text: "Hobbies",
+                hide: false,
+                controllerParam: hobbiesController),
+            TextFieldComponent(
+                text: "Musica Favorita",
+                hide: false,
+                controllerParam: musicController),
+            TextFieldComponent(
+                text: "Deporte/Juego Favorito",
+                hide: false,
+                controllerParam: sportController),
+            TextFieldComponent(
+                text: "Serie/Pelicula Favorita",
+                hide: false,
+                controllerParam: seriesController),
+            FutureBuilder(
+                future: highschools,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                      child: DropdownMenu<String>(
+                        onSelected: (String? selectedHighSchool) {
+                          setState(() {
+                            highschool = selectedHighSchool!;
+                          });
+                        },
+                        dropdownMenuEntries: snapshot.data!.map<DropdownMenuEntry<String>>((highschool) {
+                          return DropdownMenuEntry<String>(value: highschool, label: highschool);
+                        }).toList(),
+                      )
+                    );
+                  } else {
+                    return Container();
+                  }
+                }),
+            Center(
+              child: Stack(
                 children: [
-                  const TextSpan(text: "New? "),
-                  TextSpan(
-                      text: "Sign Up!",
-                      style: const TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () => Navigator.pushNamed(context, "/signin"),
-                  ),
+                  picture != null
+                      ? CircleAvatar(
+                          radius: 64,
+                          backgroundImage: FileImage(picture!),
+                        )
+                      : const CircleAvatar(
+                          radius: 64,
+                          backgroundImage:
+                              AssetImage('assets/images/avatar.webp'),
+                        ),
+                  Positioned(
+                    bottom: -10,
+                    left: 80,
+                    child: IconButton(
+                        onPressed: selectImage,
+                        icon: const Icon(Icons.add_a_photo_outlined)),
+                  )
                 ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: ElevatedButton(
+                onPressed: pushData,
+                style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.red),
+                ),
+                child: const Text(
+                  "Ingresar!",
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
           ],

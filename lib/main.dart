@@ -1,4 +1,3 @@
-import 'package:studentdex/screens/login/signin.dart';
 import 'package:flutter/material.dart';
 import 'screens/home/homemenu.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -31,9 +30,6 @@ class Home extends StatelessWidget {
         },
         '/login': (context) {
           return const Login();
-        },
-        '/signin': (context) {
-          return const SignIn();
         },
         '/character': (context) {
           return const CharacterDetails();

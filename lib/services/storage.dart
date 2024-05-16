@@ -20,4 +20,9 @@ class StorageService {
     return res;
   }
 
+  void uploadIMG(dynamic file, String path) async {
+    Reference storageRef = FirebaseStorage.instance.ref().child('pictures/').child(path);
+    storageRef.putFile(file);
+  }
+
 }
