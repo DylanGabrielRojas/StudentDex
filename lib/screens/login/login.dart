@@ -33,26 +33,29 @@ class _LoginState extends State<Login> {
     });
   }
 
-  Future<dynamic> pushData() async {
-    try {
-      if (picture != null) {
-        final character = {
-          'name': aliasController.text,
-          'annio': annioController.text,
-          'hobbies': hobbiesController.text,
-          'music': musicController.text,
-          'sport': sportController.text,
-          'series': seriesController.text,
-          'highschool': highschool,
-        };
+  Future<bool> pushData() async {
+  try {
+    if (picture != null) {
+      final character = {
+        'name': aliasController.text,
+        'annio': annioController.text,
+        'hobbies': hobbiesController.text,
+        'music': musicController.text,
+        'sport': sportController.text,
+        'series': seriesController.text,
+        'highschool': highschool,
+      };
 
-        String id = await DatabaseService().uploadCharacter(character);
-        StorageService().uploadIMG(picture!, id);
-      }
-    } catch (e) {
-      return null;
+      String id = await DatabaseService().uploadCharacter(character);
+      StorageService().uploadIMG(picture!, id);
+      return true;
+    } else {
+      return false;  // Retorna false si no hay imagen
     }
+  } catch (e) {
+    return false;  // Retorna false en caso de error
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +145,22 @@ class _LoginState extends State<Login> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: ElevatedButton(
-                onPressed: pushData,
+                onPressed: () async {
+                  bool success = await pushData();
+                  if (success) {
+                    Navigator.pushNamed(
+                      context,
+                      '/',
+                      arguments: 'Información ingresada correctamente',
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Error al ingresar la información'),
+                      ),
+                    );
+                  }
+                },
                 style: const ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll(Colors.red),
                 ),
@@ -152,7 +170,7 @@ class _LoginState extends State<Login> {
                     color: Colors.white,
                   ),
                 ),
-              ),
+              )
             ),
           ],
         ),

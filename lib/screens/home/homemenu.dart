@@ -5,9 +5,7 @@ import 'package:studentdex/services/storage.dart';
 import 'package:flutter/material.dart';
 
 class HomeMenu extends StatefulWidget {
-  const HomeMenu({
-    super.key,
-  });
+  const HomeMenu({super.key});
 
   @override
   State<HomeMenu> createState() => _HomeMenuState();
@@ -16,47 +14,64 @@ class HomeMenu extends StatefulWidget {
 class _HomeMenuState extends State<HomeMenu> {
   @override
   Widget build(BuildContext context) {
-    final Future<List<dynamic>> names;
+    final message = ModalRoute.of(context)!.settings.arguments as String?;
 
-    names = DatabaseService().getCharacter();
+    if (message != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+          ),
+        );
+      });
+    }
+
+    final Future<List<dynamic>> names = DatabaseService().getCharacter();
+
     return FutureBuilder(
-        future: names,
-        builder: (context, snapshotNames) {
-          if (snapshotNames.hasData) {
-            final List<dynamic> names = snapshotNames.requireData;
-            return Scaffold(
-              appBar: const TopBar(),
-              body: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 5,
-                  ),
-                  itemCount: names.length,
-                  itemBuilder: (context, index) {
-                    final picturePath = StorageService().getIMGfromID(names[index]['id']);
-                    return FutureBuilder(
-                        future: picturePath,
-                        builder: (context, snapshotPath) {
-                          if (snapshotPath.hasData) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(context, "/character",
-                                    arguments: names[index]['id']);
-                              },
-                              child: CharacterCard(
-                                name: names[index]['name'],
-                                picRoute: snapshotPath.requireData,
-                              ),
-                            );
-                          } else {
-                            return Container();
-                          }
-                        });
-                  }),
-            );
-          } else {
-            return Container();
-          }
-        });
+      future: names,
+      builder: (context, snapshotNames) {
+        if (snapshotNames.hasData) {
+          final List<dynamic> names = snapshotNames.requireData;
+          return Scaffold(
+            appBar: const TopBar(),
+            body: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 5,
+              ),
+              itemCount: names.length,
+              itemBuilder: (context, index) {
+                final picturePath = StorageService().getIMGfromID(names[index]['id']);
+                return FutureBuilder(
+                  future: picturePath,
+                  builder: (context, snapshotPath) {
+                    if (snapshotPath.hasData) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            "/character",
+                            arguments: names[index]['id'],
+                          );
+                        },
+                        child: CharacterCard(
+                          name: names[index]['name'],
+                          picRoute: snapshotPath.requireData,
+                        ),
+                      );
+                    } else {
+                      return Container();
+                    }
+                  },
+                );
+              },
+            ),
+          );
+        } else {
+          return Container();
+        }
+      },
+    );
   }
 }
